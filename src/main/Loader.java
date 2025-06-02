@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static main.Configuration.DATA_PATH;
+import static main.Configuration.*;
 
 public class Loader {
 

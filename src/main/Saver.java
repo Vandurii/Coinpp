@@ -45,7 +45,7 @@ public class Saver {
     }
 
     public static void saveItems(List<Item> items){
-        writeData(DATA_PATH, items, true);
+        boolean added = writeData(DATA_PATH, items, true);
+        if(added) System.out.println("The item was added to the list.");
     }
-
 }

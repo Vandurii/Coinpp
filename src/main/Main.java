@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static main.Configuration.*;
 
@@ -33,9 +35,10 @@ public class Main {
                     info(input);
                 }else {
                     switch (input) {
-                        case "cd" -> cd();
-                        case "add" -> add();
-                        case "clear" -> clearScreen();
+                        case CD_COMMAND -> cd();
+                        case ADD_COMMAND -> add();
+                        case ADD_MORE_COMMAND -> addMore();
+                        case CLEAR_COMMAND -> clearScreen();
                         default -> def(input);
                     }
                 }
@@ -69,15 +72,29 @@ public class Main {
         }
     }
 
+    public static void printAll(List<Item> list){
+        for(Item i: list){
+            System.out.println(i.getAllFlags());
+        }
+    }
+
     public static void info(String input){
         String flags = input.substring(INFO_COMMAND.length());
 
         if(flags.isEmpty()){
-            float spend = ExpenseTracker.getMonthExpenses(currentMontInt);
-            System.out.printf("Spend: %s%n", spend);
+            ExpenseTracker.printExpenses(currentMontInt);
         }else {
-         //todo
+            infoF(flags);
         }
+    }
+
+    public static void infoF(String args){
+        String[] argTable = args.split(FLAG_SEPARATOR + "");
+
+        for (String a : argTable) {
+
+        }
+
     }
 
     public static void cd(){
@@ -85,11 +102,40 @@ public class Main {
     }
 
     public static void add() throws IOException {
-        System.out.printf("name%sprice%scategory%scode\n", SEPARATOR, SEPARATOR, SEPARATOR);
+        System.out.printf("name%sprice%scategory%scode%sshop\n", SEPARATOR, SEPARATOR, SEPARATOR, SEPARATOR);
         String line = bufferedReader.readLine();
         Item item = Item.createItem(line);
 
         if(item != null) Saver.saveItem(item);
+    }
+
+    public static void addMore() throws IOException {
+        System.out.printf("name%sprice%scategory%scode%sshop\tType 'q' to finish adding | ls if you want  to check the current list.\n", SEPARATOR, SEPARATOR, SEPARATOR, SEPARATOR);
+        String line;
+        List<Item> temptItems = new ArrayList<>();
+
+        while (!(line = bufferedReader.readLine()).equals(Q_COMMAND)) {
+            if(line.equals(LS_COMMAND)){
+                printAll(temptItems);
+                ExpenseTracker.printExpenses(temptItems);
+            }else {
+                Item item = Item.createItem(line);
+                if (item != null) temptItems.add(item);
+            }
+        }
+
+        System.out.println("Do you want to save the list? (y/n)");
+        printAll(temptItems);
+
+        while(!(line = bufferedReader.readLine()).equals(Y_COMMAND) && !(line.equals(N_COMMAND))){
+            def(line);
+        }
+
+        if(line.equals(Y_COMMAND)){
+            Saver.saveItems(temptItems);
+        }else {
+            System.out.println("The changes haven't been made.");
+        }
     }
 
     public static void def(String input){
